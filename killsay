@@ -4,6 +4,30 @@ local RunService = game:GetService("RunService")
 local VirtualUser = game:GetService("VirtualUser")
 local Mouse = LocalPlayer:GetMouse()
 
+-- Funkce pro nekonečnou munici a rychlé střílení
+local function enableInfiniteAmmoAndFastFire()
+    for _, tool in pairs(LocalPlayer.Backpack:GetChildren()) do
+        if tool:IsA("Tool") and tool:FindFirstChild("Ammo") then
+            tool.Ammo.Value = math.huge  -- Nekonečno nábojů
+        end
+        if tool:FindFirstChild("FireRate") then
+            tool.FireRate.Value = 0.01  -- Extrémně rychlá kadence
+        end
+    end
+
+    local character = LocalPlayer.Character
+    if character then
+        for _, tool in pairs(character:GetChildren()) do
+            if tool:IsA("Tool") and tool:FindFirstChild("Ammo") then
+                tool.Ammo.Value = math.huge  -- Nekonečno nábojů
+            end
+            if tool:FindFirstChild("FireRate") then
+                tool.FireRate.Value = 0.01  -- Extrémně rychlá kadence
+            end
+        end
+    end
+end
+
 -- Funkce pro kontrolu, zda je nepřítel nad zemí (nad určitým minimálním y)
 local function isAboveGround(position)
     local minY = 10  -- Nastav minimum Y souřadnice, pod kterou nepůjdeme (záleží na mapě)
@@ -69,6 +93,7 @@ end
 
 -- Hlavní smyčka, která se spustí na každého nepřítele
 RunService.RenderStepped:Connect(function()
+    enableInfiniteAmmoAndFastFire()  -- Každý frame zajistí, že máš nekonečnou munici a rychlé střílení
     local enemy = findNearestEnemy()
     if enemy then
         teleportBehindEnemy(enemy)
