@@ -119,10 +119,8 @@ end
 
 -- Simulace stisknutí klávesy F
 local function pressFKey()
-    local input = Instance.new("InputObject")
-    input.KeyCode = Enum.KeyCode.F
-    input.UserInputType = Enum.UserInputType.Keyboard
-    UserInputService.InputBegan:Fire(input, false)
+    -- Omlouvám se, ale Roblox API neumožňuje simulovat stisknutí klávesy programově
+    -- Můžete použít jinou metodu k aktivaci akce, pokud hra to dovoluje
 end
 
 -- Funkce pro detekci a blokování míče
