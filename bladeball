@@ -1,5 +1,5 @@
 --[[
-  Verified Script / Compatible With Celery .gg/celery 
+  Verified Script / Compatable With Celery .gg/celery 
   Made by Primelus.dll / Fortnite GODxx223 / Pitbull Hub   
   (https://osshub.xyz https://getratted.lol) - #1 Scripts
 ]]
@@ -776,6 +776,11 @@ Tab3:AddParagraph("Developer","Primelus | 1040709577328570378")
 Tab3:AddButton({
     Name = "Join Our Discord",
     Callback = function()
+        local clipboardValues = {
+            "https://discord.gg/6Cd68uQn2J",
+            "https://discord.gg/E9SPpvcF",
+            "https://osshub.xyz"
+        }
 
         local function copyValues(values)
             for _, value in ipairs(values) do
