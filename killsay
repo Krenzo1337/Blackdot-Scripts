@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
 
 -- Funkce pro teleportaci hráče za záda nepřítele
 local function teleportBehindEnemy(enemy)
@@ -11,12 +12,29 @@ local function teleportBehindEnemy(enemy)
     end
 end
 
+-- Funkce pro automatické zaměření na hlavu
+local function aimAtHead(enemy)
+    if enemy and enemy.Character and enemy.Character:FindFirstChild("Head") then
+        local headPosition = enemy.Character.Head.Position
+        local camera = workspace.CurrentCamera
+        camera.CFrame = CFrame.new(camera.CFrame.Position, headPosition)
+    end
+end
+
+-- Funkce pro automatické střílení
+local function autoShoot()
+    -- Simulace stisknutí levého tlačítka myši
+    UserInputService.InputBegan:Fire(Enum.UserInputType.MouseButton1)
+    wait(0.1)  -- Počkáme trochu, abychom simulovali krátké stisknutí
+    UserInputService.InputEnded:Fire(Enum.UserInputType.MouseButton1)
+end
+
 -- Funkce pro automatické zabití nepřítele
 local function killEnemy(enemy)
     if enemy and enemy.Character and enemy.Character:FindFirstChild("Humanoid") then
         local humanoid = enemy.Character.Humanoid
         if humanoid.Health > 0 then
-            humanoid:TakeDamage(humanoid.MaxHealth)
+            autoShoot()
         end
     end
 end
@@ -39,11 +57,12 @@ local function findNearestEnemy()
     return nearestEnemy
 end
 
--- Hlavní smyčka, která se spustí každého nepřítele
+-- Hlavní smyčka, která se spustí na každého nepřítele
 RunService.RenderStepped:Connect(function()
     local enemy = findNearestEnemy()
     if enemy then
         teleportBehindEnemy(enemy)
+        aimAtHead(enemy)
         killEnemy(enemy)
     end
 end)
