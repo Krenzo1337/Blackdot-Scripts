@@ -3,6 +3,7 @@ local LocalPlayer = Players.LocalPlayer
 local RunService = game:GetService("RunService")
 local VirtualUser = game:GetService("VirtualUser")
 local Mouse = LocalPlayer:GetMouse()
+local currentEnemy = nil
 
 -- Funkce pro nekonečnou munici a rychlé střílení (fast spread)
 local function enableInfiniteAmmoAndFastFire()
@@ -12,15 +13,15 @@ local function enableInfiniteAmmoAndFastFire()
             if tool:IsA("Tool") then
                 -- Zajistíme nekonečnou munici
                 if tool:FindFirstChild("Ammo") then
-                    tool.Ammo.Value = math.huge  -- Nastav nekonečné náboje
+                    tool.Ammo.Value = math.huge
                 end
                 -- Rychlá střelba
                 if tool:FindFirstChild("FireRate") then
-                    tool.FireRate.Value = 0.01  -- Nastav velmi rychlou kadenci
+                    tool.FireRate.Value = 0.01
                 end
                 -- Fast spread (rychlé šíření střelby)
                 if tool:FindFirstChild("Spread") then
-                    tool.Spread.Value = 0  -- Minimalizuj rozptyl střelby
+                    tool.Spread.Value = 0
                 end
                 -- Pokud zbraň má klip (zásobník), ujistěte se, že se nikdy nevyprázdní
                 if tool:FindFirstChild("ClipSize") then
@@ -36,7 +37,7 @@ end
 
 -- Funkce pro kontrolu, zda je nepřítel nad zemí (nad určitým minimálním y)
 local function isAboveGround(position)
-    local minY = 10  -- Nastav minimum Y souřadnice, pod kterou nepůjdeme (záleží na mapě)
+    local minY = 10
     return position.Y > minY
 end
 
@@ -97,13 +98,24 @@ local function findNearestEnemy()
     return nearestEnemy
 end
 
+-- Funkce pro sledování stavu nepřítele a okamžité přepnutí
+local function checkAndSwitchEnemy()
+    if currentEnemy and currentEnemy.Character and currentEnemy.Character:FindFirstChild("Humanoid") and currentEnemy.Character.Humanoid.Health > 0 then
+        return
+    end
+    
+    -- Pokud aktuální nepřítel je mrtvý nebo neexistuje, najdi nového
+    currentEnemy = findNearestEnemy()
+end
+
 -- Hlavní smyčka, která se spustí na každého nepřítele
 RunService.RenderStepped:Connect(function()
     enableInfiniteAmmoAndFastFire()  -- Každý frame zajistí nekonečnou munici a rychlé střílení
-    local enemy = findNearestEnemy()
-    if enemy then
-        teleportBehindEnemy(enemy)
-        engageEnemy(enemy)
+    checkAndSwitchEnemy()  -- Kontrola a přepnutí na nového nepřítele pokud je to potřeba
+    
+    if currentEnemy then
+        teleportBehindEnemy(currentEnemy)
+        engageEnemy(currentEnemy)
     else
         releaseMouseClick()  -- Pokud není žádný nepřítel, uvolníme tlačítko myši
     end
