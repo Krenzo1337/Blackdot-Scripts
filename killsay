@@ -4,50 +4,60 @@ local RunService = game:GetService("RunService")
 local VirtualUser = game:GetService("VirtualUser")
 local Mouse = LocalPlayer:GetMouse()
 
+-- Funkce pro kontrolu, zda je nepřítel nad zemí (nad určitým minimálním y)
+local function isAboveGround(position)
+    local minY = 10  -- Nastav minimum Y souřadnice, pod kterou nepůjdeme (záleží na mapě)
+    return position.Y > minY
+end
+
 -- Funkce pro teleportaci hráče za záda nepřítele
 local function teleportBehindEnemy(enemy)
     if enemy and enemy.Character and enemy.Character:FindFirstChild("HumanoidRootPart") then
         local enemyPosition = enemy.Character.HumanoidRootPart.Position
-        local offset = enemy.Character.HumanoidRootPart.CFrame.lookVector * -5
-        LocalPlayer.Character:SetPrimaryPartCFrame(CFrame.new(enemyPosition + offset))
+        if isAboveGround(enemyPosition) then
+            local offset = enemy.Character.HumanoidRootPart.CFrame.lookVector * -5
+            LocalPlayer.Character:SetPrimaryPartCFrame(CFrame.new(enemyPosition + offset))
+        end
     end
 end
 
--- Funkce pro automatické zaměření na hlavu
-local function aimAtHead(enemy)
-    if enemy and enemy.Character and enemy.Character:FindFirstChild("Head") then
-        local headPosition = enemy.Character.Head.Position
-        Mouse.Hit = CFrame.new(headPosition)
+-- Funkce pro automatické zaměření na nepřítele
+local function aimAtEnemy(enemy)
+    if enemy and enemy.Character and enemy.Character:FindFirstChild("HumanoidRootPart") then
+        local enemyPosition = enemy.Character.HumanoidRootPart.Position
+        local camera = workspace.CurrentCamera
+        camera.CFrame = CFrame.new(camera.CFrame.Position, enemyPosition)
     end
 end
 
--- Funkce pro držení levého tlačítka myši
+-- Funkce pro simulaci držení levého tlačítka myši
 local function holdMouseClick()
-    VirtualUser:Button1Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+    VirtualUser:Button1Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
 end
 
 -- Funkce pro uvolnění levého tlačítka myši
 local function releaseMouseClick()
-    VirtualUser:Button1Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+    VirtualUser:Button1Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
 end
 
--- Funkce pro automatické zabití nepřítele
-local function killEnemy(enemy)
+-- Funkce pro automatické zaměření a držení levého tlačítka myši při zabíjení nepřítele
+local function engageEnemy(enemy)
     if enemy and enemy.Character and enemy.Character:FindFirstChild("Humanoid") then
-        aimAtHead(enemy)
+        aimAtEnemy(enemy)
         holdMouseClick()
     end
 end
 
--- Funkce pro nalezení nejbližšího nepřítele
+-- Funkce pro nalezení nejbližšího nepřítele nad zemí
 local function findNearestEnemy()
     local nearestEnemy = nil
     local shortestDistance = math.huge
 
     for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer and player.Team ~= LocalPlayer.Team and player.Character and player.Character:FindFirstChild("Humanoid") then
-            local distance = (LocalPlayer.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).magnitude
-            if distance < shortestDistance then
+            local enemyPosition = player.Character.HumanoidRootPart.Position
+            local distance = (LocalPlayer.Character.HumanoidRootPart.Position - enemyPosition).magnitude
+            if distance < shortestDistance and isAboveGround(enemyPosition) then
                 shortestDistance = distance
                 nearestEnemy = player
             end
@@ -62,7 +72,7 @@ RunService.RenderStepped:Connect(function()
     local enemy = findNearestEnemy()
     if enemy then
         teleportBehindEnemy(enemy)
-        killEnemy(enemy)
+        engageEnemy(enemy)
     else
         releaseMouseClick()  -- Pokud není žádný nepřítel, uvolníme tlačítko myši
     end
