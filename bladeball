@@ -1,3 +1,23 @@
+--[[
+  Verified Script / Compatible With Celery .gg/celery 
+  Made by Primelus.dll / Fortnite GODxx223 / Pitbull Hub   
+  (https://osshub.xyz https://getratted.lol) - #1 Scripts
+]]
+
+print([[
+  ______    ______    ______         __    __  __    __  _______         __     __   ______  
+ /      \  /      \  /      \       /  |  /  |/  |  /  |/       \       /  |   /  | /      \ 
+/$$$$$$  |/$$$$$$  |/$$$$$$  |      $$ |  $$ |$$ |  $$ |$$$$$$$  |      $$ |   $$ |/$$$$$$  |
+$$ |  $$ |$$ \__$$/ $$ \__$$/       $$ |__$$ |$$ |  $$ |$$ |__$$ |      $$ |   $$ |$$ \__$$ |
+$$ |  $$ |$$      \ $$      \       $$    $$ |$$ |  $$ |$$    $$<       $$  \ /$$/ $$    $$< 
+$$ |  $$ | $$$$$$  | $$$$$$  |      $$$$$$$$ |$$ |  $$ |$$$$$$$  |       $$  /$$/   $$$$$$  |
+$$ \__$$ |/  \__$$ |/  \__$$ |      $$ |  $$ |$$ \__$$ |$$ |__$$ |        $$ $$/   $$ \__$$ |
+$$    $$/ $$    $$/ $$    $$/       $$ |  $$ |$$    $$/ $$    $$/          $$$/    $$    $$/ 
+ $$$$$$/   $$$$$$/   $$$$$$/        $$/   $$/  $$$$$$/  $$$$$$$/            $/      $$$$$$/  
+ 
+    	-> https://osshub.xyz/ - #1 Fast, Stable, Secure Scripts <-
+]])
+
 
 local Stats = game:GetService("Stats")
 local Players = game:GetService("Players")
