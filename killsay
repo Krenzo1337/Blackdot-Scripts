@@ -1,46 +1,33 @@
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalPlayer = Players.LocalPlayer
 
+-- Funkce pro odeslání zprávy do chatu
 local function sendMessage()
     local message = "blackdots.xyz best executor!"
-    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(message, "All")
+    ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(message, "All")
 end
 
-local function onKill(victim)
-    if victim ~= LocalPlayer then
-        sendMessage()
-    end
+-- Funkce pro sledování, zda hráč někoho zabil
+local function onPlayerKill()
+    -- Počkej chvíli a pošle zprávu do chatu (možná bude nutné upravit časování)
+    wait(0.1)
+    sendMessage()
 end
 
-
+-- Připojí se k eventu, který se aktivuje, když hráč získá kill
 local function setupKillDetection()
-    for _, player in pairs(Players:GetPlayers()) do
-        player.CharacterAdded:Connect(function(character)
-            local humanoid = character:WaitForChild("Humanoid")
-            humanoid.Died:Connect(function()
-                if humanoid:FindFirstChild("creator") then
-                    local killer = humanoid.creator.Value
-                    if killer == LocalPlayer then
-                        onKill(player)
-                    end
-                end
-            end)
-        end)
-    end
-
-    Players.PlayerAdded:Connect(function(player)
-        player.CharacterAdded:Connect(function(character)
-            local humanoid = character:WaitForChild("Humanoid")
-            humanoid.Died:Connect(function()
-                if humanoid:FindFirstChild("creator") then
-                    local killer = humanoid.creator.Value
-                    if killer == LocalPlayer then
-                        onKill(player)
-                    end
-                end)
-            end)
+    LocalPlayer.CharacterAdded:Connect(function(character)
+        -- Předpokládáme, že existuje event pro přidání bodu nebo killu
+        character:WaitForChild("Humanoid").Died:Connect(function()
+            -- Check if the local player got the kill
+            local killer = character:FindFirstChild("creator")
+            if killer and killer.Value == LocalPlayer then
+                onPlayerKill()
+            end
         end)
     end)
 end
 
+-- Inicializace sledování
 setupKillDetection()
