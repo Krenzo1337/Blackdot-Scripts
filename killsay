@@ -1,33 +1,49 @@
 local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
 
--- Funkce pro odeslání zprávy do chatu
-local function sendMessage()
-    local message = "blackdots.xyz best executor!"
-    ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(message, "All")
+-- Funkce pro teleportaci hráče za záda nepřítele
+local function teleportBehindEnemy(enemy)
+    if enemy and enemy.Character and enemy.Character:FindFirstChild("HumanoidRootPart") then
+        local enemyPosition = enemy.Character.HumanoidRootPart.Position
+        local offset = enemy.Character.HumanoidRootPart.CFrame.lookVector * -5
+        LocalPlayer.Character:SetPrimaryPartCFrame(CFrame.new(enemyPosition + offset))
+    end
 end
 
--- Funkce pro sledování, zda hráč někoho zabil
-local function onPlayerKill()
-    -- Počkej chvíli a pošle zprávu do chatu (možná bude nutné upravit časování)
-    wait(0.1)
-    sendMessage()
+-- Funkce pro automatické zabití nepřítele
+local function killEnemy(enemy)
+    if enemy and enemy.Character and enemy.Character:FindFirstChild("Humanoid") then
+        local humanoid = enemy.Character.Humanoid
+        if humanoid.Health > 0 then
+            humanoid:TakeDamage(humanoid.MaxHealth)
+        end
+    end
 end
 
--- Připojí se k eventu, který se aktivuje, když hráč získá kill
-local function setupKillDetection()
-    LocalPlayer.CharacterAdded:Connect(function(character)
-        -- Předpokládáme, že existuje event pro přidání bodu nebo killu
-        character:WaitForChild("Humanoid").Died:Connect(function()
-            -- Check if the local player got the kill
-            local killer = character:FindFirstChild("creator")
-            if killer and killer.Value == LocalPlayer then
-                onPlayerKill()
+-- Funkce pro nalezení nejbližšího nepřítele
+local function findNearestEnemy()
+    local nearestEnemy = nil
+    local shortestDistance = math.huge
+
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Team ~= LocalPlayer.Team and player.Character and player.Character:FindFirstChild("Humanoid") then
+            local distance = (LocalPlayer.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).magnitude
+            if distance < shortestDistance then
+                shortestDistance = distance
+                nearestEnemy = player
             end
-        end)
-    end)
+        end
+    end
+
+    return nearestEnemy
 end
 
--- Inicializace sledování
-setupKillDetection()
+-- Hlavní smyčka, která se spustí každého nepřítele
+RunService.RenderStepped:Connect(function()
+    local enemy = findNearestEnemy()
+    if enemy then
+        teleportBehindEnemy(enemy)
+        killEnemy(enemy)
+    end
+end)
