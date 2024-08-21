@@ -1,69 +1,51 @@
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
-local ScreenGui = Instance.new("ScreenGui")
-local Frame = Instance.new("Frame")
-local TitleLabel = Instance.new("TextLabel")
-local BlockCheckbox = Instance.new("TextButton")
-local BallDetectionCheckbox = Instance.new("TextButton")
-local VisualIndicatorCheckbox = Instance.new("TextButton")
+local RunService = game:GetService("RunService")
 
--- UI Nastavení
+-- Vytvoření ScreenGui a Frame pro UI
+local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "BlackdotMenu"
 ScreenGui.Parent = LocalPlayer.PlayerGui
 
+local Frame = Instance.new("Frame")
 Frame.Name = "MenuFrame"
 Frame.Size = UDim2.new(0, 300, 0, 200)
 Frame.Position = UDim2.new(0.5, -150, 0.5, -100)
-Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-Frame.BackgroundTransparency = 0.8
+Frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+Frame.BackgroundTransparency = 0.9
 Frame.BorderSizePixel = 0
 Frame.Parent = ScreenGui
 
+local TitleLabel = Instance.new("TextLabel")
 TitleLabel.Name = "TitleLabel"
 TitleLabel.Size = UDim2.new(1, 0, 0, 50)
 TitleLabel.Position = UDim2.new(0, 0, 0, 0)
 TitleLabel.Text = "Blackdot - Bladeball"
 TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 TitleLabel.TextScaled = true
-TitleLabel.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+TitleLabel.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 TitleLabel.BorderSizePixel = 0
 TitleLabel.Parent = Frame
 
--- Checkbox pro BLOCK
-BlockCheckbox.Name = "BlockCheckbox"
-BlockCheckbox.Size = UDim2.new(1, 0, 0, 50)
-BlockCheckbox.Position = UDim2.new(0, 0, 0.2, 0)
-BlockCheckbox.Text = "Enable Block"
-BlockCheckbox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-BlockCheckbox.TextColor3 = Color3.fromRGB(255, 255, 255)
-BlockCheckbox.TextScaled = true
-BlockCheckbox.BorderSizePixel = 1
-BlockCheckbox.BorderColor3 = Color3.fromRGB(255, 255, 255)
-BlockCheckbox.Parent = Frame
+-- Vytvoření checkboxů
+local function createCheckbox(name, text, position)
+    local checkbox = Instance.new("TextButton")
+    checkbox.Name = name
+    checkbox.Size = UDim2.new(1, 0, 0, 50)
+    checkbox.Position = position
+    checkbox.Text = text
+    checkbox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    checkbox.TextColor3 = Color3.fromRGB(255, 255, 255)
+    checkbox.TextScaled = true
+    checkbox.BorderSizePixel = 1
+    checkbox.BorderColor3 = Color3.fromRGB(255, 255, 255)
+    checkbox.Parent = Frame
+    return checkbox
+end
 
--- Checkbox pro Detekci míče
-BallDetectionCheckbox.Name = "BallDetectionCheckbox"
-BallDetectionCheckbox.Size = UDim2.new(1, 0, 0, 50)
-BallDetectionCheckbox.Position = UDim2.new(0, 0, 0.4, 0)
-BallDetectionCheckbox.Text = "Enable Ball Detection"
-BallDetectionCheckbox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-BallDetectionCheckbox.TextColor3 = Color3.fromRGB(255, 255, 255)
-BallDetectionCheckbox.TextScaled = true
-BallDetectionCheckbox.BorderSizePixel = 1
-BallDetectionCheckbox.BorderColor3 = Color3.fromRGB(255, 255, 255)
-BallDetectionCheckbox.Parent = Frame
-
--- Checkbox pro Vizuální indikátor
-VisualIndicatorCheckbox.Name = "VisualIndicatorCheckbox"
-VisualIndicatorCheckbox.Size = UDim2.new(1, 0, 0, 50)
-VisualIndicatorCheckbox.Position = UDim2.new(0, 0, 0.6, 0)
-VisualIndicatorCheckbox.Text = "Enable Visual Indicator"
-VisualIndicatorCheckbox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-VisualIndicatorCheckbox.TextColor3 = Color3.fromRGB(255, 255, 255)
-VisualIndicatorCheckbox.TextScaled = true
-VisualIndicatorCheckbox.BorderSizePixel = 1
-VisualIndicatorCheckbox.BorderColor3 = Color3.fromRGB(255, 255, 255)
-VisualIndicatorCheckbox.Parent = Frame
+local BlockCheckbox = createCheckbox("BlockCheckbox", "Enable Block", UDim2.new(0, 0, 0.2, 0))
+local BallDetectionCheckbox = createCheckbox("BallDetectionCheckbox", "Enable Ball Detection", UDim2.new(0, 0, 0.4, 0))
+local VisualIndicatorCheckbox = createCheckbox("VisualIndicatorCheckbox", "Enable Visual Indicator", UDim2.new(0, 0, 0.6, 0))
 
 -- Přetahování GUI
 local dragging
@@ -107,7 +89,7 @@ local function toggleCheckbox(button)
         button.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
         -- Aktivace funkce
         if button.Name == "BlockCheckbox" then
-            script.Parent:FindFirstChild("BlockButton").Visible = true
+            -- Zapnout funkci BLOCK
         elseif button.Name == "BallDetectionCheckbox" then
             -- Zapnout detekci míče
         elseif button.Name == "VisualIndicatorCheckbox" then
@@ -117,7 +99,7 @@ local function toggleCheckbox(button)
         button.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
         -- Deaktivace funkce
         if button.Name == "BlockCheckbox" then
-            script.Parent:FindFirstChild("BlockButton").Visible = false
+            -- Vypnout funkci BLOCK
         elseif button.Name == "BallDetectionCheckbox" then
             -- Vypnout detekci míče
         elseif button.Name == "VisualIndicatorCheckbox" then
@@ -138,14 +120,6 @@ end)
 VisualIndicatorCheckbox.MouseButton1Click:Connect(function()
     toggleCheckbox(VisualIndicatorCheckbox)
 end)
-
--- Funkce pro automatické kliknutí na tlačítko BLOCK
-local function clickBlockButton()
-    local blockButton = LocalPlayer.PlayerGui:FindFirstChild("BlockButton")
-    if blockButton and blockButton:IsA("GuiButton") then
-        blockButton.MouseButton1Click:Fire() -- Simulace kliknutí na tlačítko
-    end
-end
 
 -- Vytvoření a nastavení vizuálního indikátoru
 local function createVisualIndicator()
@@ -183,7 +157,8 @@ local function findAndHandleRedBall()
             local ballSpeed = getBallSpeed(object)
             local newRadius = math.min(ballSpeed / 10, 20) -- Přizpůsobíme maximální dosah
             updateVisualIndicator(newRadius)
-            clickBlockButton() -- Klikni na tlačítko BLOCK
+            -- Klikni na tlačítko BLOCK
+            clickBlockButton()
             break -- Pokud je míč zpracován, není třeba pokračovat ve hledání
         end
     end
@@ -195,3 +170,11 @@ RunService.RenderStepped:Connect(function()
         findAndHandleRedBall()
     end
 end)
+
+-- Funkce pro automatické kliknutí na tlačítko BLOCK
+local function clickBlockButton()
+    local blockButton = LocalPlayer.PlayerGui:FindFirstChild("BlockButton")
+    if blockButton and blockButton:IsA("GuiButton") then
+        blockButton.MouseButton1Click:Fire() -- Simulace kliknutí na tlačítko
+    end
+end
