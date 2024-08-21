@@ -3,6 +3,7 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
 
 -- Vytvoření ScreenGui a Frame pro UI
 local ScreenGui = Instance.new("ScreenGui")
@@ -103,8 +104,8 @@ VisualIndicatorCheckbox.MouseButton1Click:Connect(function()
 end)
 
 -- Funkce pro detekci červeného míče
-local function isRedBall(ball)
-    return ball:IsA("Ball") and ball.BrickColor == BrickColor.new("Bright red")
+local function isRedBall(object)
+    return object:IsA("Ball") and object.BrickColor == BrickColor.new("Bright red")
 end
 
 local function isBallNear(ball, distance)
@@ -115,21 +116,28 @@ end
 
 -- Simulace stisknutí klávesy F
 local function pressFKey()
-    UserInputService.InputBegan:Connect(function(input)
-        if input.KeyCode == Enum.KeyCode.F then
+    UserInputService.InputBegan:Connect(function(input, gameProcessed)
+        if input.KeyCode == Enum.KeyCode.F and not gameProcessed then
             input.UserInputState = Enum.UserInputState.Begin
         end
     end)
 end
 
--- Hlavní smyčka pro detekci míče
+-- Funkce pro detekci a blokování míče
+local function findAndHandleRedBall()
+    local maxDistance = 10 -- Startovní hodnota dosahu, měníme podle rychlosti míče
+    for _, object in pairs(Workspace:GetChildren()) do
+        if isRedBall(object) and isBallNear(object, maxDistance) then
+            -- Při detekci míče upravíme dosah podle rychlosti míče
+            pressFKey()
+            break -- Pokud je míč zpracován, není třeba pokračovat ve hledání
+        end
+    end
+end
+
+-- Hlavní smyčka pro kontrolu míče a klikání
 RunService.RenderStepped:Connect(function()
     if BallDetectionCheckbox.BackgroundColor3 == Color3.fromRGB(0, 255, 0) then
-        for _, object in pairs(workspace:GetChildren()) do
-            if isRedBall(object) and isBallNear(object, 10) then
-                pressFKey()
-                break
-            end
-        end
+        findAndHandleRedBall()
     end
 end)
