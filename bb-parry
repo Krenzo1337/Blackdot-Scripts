@@ -14,8 +14,9 @@ ScreenGui.Parent = LocalPlayer.PlayerGui
 Frame.Name = "MenuFrame"
 Frame.Size = UDim2.new(0, 300, 0, 200)
 Frame.Position = UDim2.new(0.5, -150, 0.5, -100)
-Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-Frame.BackgroundTransparency = 0.5
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Frame.BackgroundTransparency = 0.8
+Frame.BorderSizePixel = 0
 Frame.Parent = ScreenGui
 
 TitleLabel.Name = "TitleLabel"
@@ -25,6 +26,7 @@ TitleLabel.Text = "Blackdot - Bladeball"
 TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 TitleLabel.TextScaled = true
 TitleLabel.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+TitleLabel.BorderSizePixel = 0
 TitleLabel.Parent = Frame
 
 -- Checkbox pro BLOCK
@@ -32,9 +34,11 @@ BlockCheckbox.Name = "BlockCheckbox"
 BlockCheckbox.Size = UDim2.new(1, 0, 0, 50)
 BlockCheckbox.Position = UDim2.new(0, 0, 0.2, 0)
 BlockCheckbox.Text = "Enable Block"
-BlockCheckbox.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+BlockCheckbox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
 BlockCheckbox.TextColor3 = Color3.fromRGB(255, 255, 255)
 BlockCheckbox.TextScaled = true
+BlockCheckbox.BorderSizePixel = 1
+BlockCheckbox.BorderColor3 = Color3.fromRGB(255, 255, 255)
 BlockCheckbox.Parent = Frame
 
 -- Checkbox pro Detekci míče
@@ -42,9 +46,11 @@ BallDetectionCheckbox.Name = "BallDetectionCheckbox"
 BallDetectionCheckbox.Size = UDim2.new(1, 0, 0, 50)
 BallDetectionCheckbox.Position = UDim2.new(0, 0, 0.4, 0)
 BallDetectionCheckbox.Text = "Enable Ball Detection"
-BallDetectionCheckbox.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+BallDetectionCheckbox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
 BallDetectionCheckbox.TextColor3 = Color3.fromRGB(255, 255, 255)
 BallDetectionCheckbox.TextScaled = true
+BallDetectionCheckbox.BorderSizePixel = 1
+BallDetectionCheckbox.BorderColor3 = Color3.fromRGB(255, 255, 255)
 BallDetectionCheckbox.Parent = Frame
 
 -- Checkbox pro Vizuální indikátor
@@ -52,14 +58,52 @@ VisualIndicatorCheckbox.Name = "VisualIndicatorCheckbox"
 VisualIndicatorCheckbox.Size = UDim2.new(1, 0, 0, 50)
 VisualIndicatorCheckbox.Position = UDim2.new(0, 0, 0.6, 0)
 VisualIndicatorCheckbox.Text = "Enable Visual Indicator"
-VisualIndicatorCheckbox.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+VisualIndicatorCheckbox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
 VisualIndicatorCheckbox.TextColor3 = Color3.fromRGB(255, 255, 255)
 VisualIndicatorCheckbox.TextScaled = true
+VisualIndicatorCheckbox.BorderSizePixel = 1
+VisualIndicatorCheckbox.BorderColor3 = Color3.fromRGB(255, 255, 255)
 VisualIndicatorCheckbox.Parent = Frame
+
+-- Přetahování GUI
+local dragging
+local dragInput
+local dragStart
+local startPos
+
+local function update(input)
+    local delta = input.Position - dragStart
+    Frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+Frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Frame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+Frame.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+RunService.RenderStepped:Connect(function()
+    if dragging and dragInput then
+        update(dragInput)
+    end
+end)
 
 -- Funkce pro kliknutí na checkbox
 local function toggleCheckbox(button)
-    if button.BackgroundColor3 == Color3.fromRGB(255, 0, 0) then
+    if button.BackgroundColor3 == Color3.fromRGB(70, 70, 70) then
         button.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
         -- Aktivace funkce
         if button.Name == "BlockCheckbox" then
@@ -70,7 +114,7 @@ local function toggleCheckbox(button)
             -- Zapnout vizuální indikátor
         end
     else
-        button.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        button.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
         -- Deaktivace funkce
         if button.Name == "BlockCheckbox" then
             script.Parent:FindFirstChild("BlockButton").Visible = false
