@@ -148,6 +148,22 @@ local function updateVisualIndicator(radius)
     visualIndicator.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -radius)
 end
 
+-- Placeholder funkce pro detekci míče
+local function isRedBall(object)
+    return object:IsA("Ball") and object.BrickColor == BrickColor.new("Bright red") -- Úprava podle skutečných parametrů míče
+end
+
+local function isBallNear(ball, distance)
+    local character = LocalPlayer.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") then return false end
+    return (ball.Position - character.HumanoidRootPart.Position).magnitude <= distance
+end
+
+local function getBallSpeed(ball)
+    -- Placeholder pro rychlost míče, bude třeba upravit podle hry
+    return ball.Velocity.Magnitude
+end
+
 -- Funkce pro detekci a blokování míče
 local function findAndHandleRedBall()
     local maxDistance = 10 -- Startovní hodnota dosahu, měníme podle rychlosti míče
