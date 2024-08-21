@@ -4,25 +4,31 @@ local RunService = game:GetService("RunService")
 local VirtualUser = game:GetService("VirtualUser")
 local Mouse = LocalPlayer:GetMouse()
 
--- Funkce pro nekonečnou munici a rychlé střílení
+-- Funkce pro nekonečnou munici a rychlé střílení (fast spread)
 local function enableInfiniteAmmoAndFastFire()
-    for _, tool in pairs(LocalPlayer.Backpack:GetChildren()) do
-        if tool:IsA("Tool") and tool:FindFirstChild("Ammo") then
-            tool.Ammo.Value = math.huge  -- Nekonečno nábojů
-        end
-        if tool:FindFirstChild("FireRate") then
-            tool.FireRate.Value = 0.01  -- Extrémně rychlá kadence
-        end
-    end
-
     local character = LocalPlayer.Character
     if character then
         for _, tool in pairs(character:GetChildren()) do
-            if tool:IsA("Tool") and tool:FindFirstChild("Ammo") then
-                tool.Ammo.Value = math.huge  -- Nekonečno nábojů
-            end
-            if tool:FindFirstChild("FireRate") then
-                tool.FireRate.Value = 0.01  -- Extrémně rychlá kadence
+            if tool:IsA("Tool") then
+                -- Zajistíme nekonečnou munici
+                if tool:FindFirstChild("Ammo") then
+                    tool.Ammo.Value = math.huge  -- Nastav nekonečné náboje
+                end
+                -- Rychlá střelba
+                if tool:FindFirstChild("FireRate") then
+                    tool.FireRate.Value = 0.01  -- Nastav velmi rychlou kadenci
+                end
+                -- Fast spread (rychlé šíření střelby)
+                if tool:FindFirstChild("Spread") then
+                    tool.Spread.Value = 0  -- Minimalizuj rozptyl střelby
+                end
+                -- Pokud zbraň má klip (zásobník), ujistěte se, že se nikdy nevyprázdní
+                if tool:FindFirstChild("ClipSize") then
+                    tool.ClipSize.Value = math.huge
+                end
+                if tool:FindFirstChild("CurrentAmmo") then
+                    tool.CurrentAmmo.Value = tool.ClipSize.Value
+                end
             end
         end
     end
@@ -93,7 +99,7 @@ end
 
 -- Hlavní smyčka, která se spustí na každého nepřítele
 RunService.RenderStepped:Connect(function()
-    enableInfiniteAmmoAndFastFire()  -- Každý frame zajistí, že máš nekonečnou munici a rychlé střílení
+    enableInfiniteAmmoAndFastFire()  -- Každý frame zajistí nekonečnou munici a rychlé střílení
     local enemy = findNearestEnemy()
     if enemy then
         teleportBehindEnemy(enemy)
