@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local RunService = game:GetService("RunService")
+local VirtualUser = game:GetService("VirtualUser")
 local Mouse = LocalPlayer:GetMouse()
 
 -- Funkce pro teleportaci hráče za záda nepřítele
@@ -20,19 +21,21 @@ local function aimAtHead(enemy)
     end
 end
 
--- Funkce pro automatické střílení
-local function autoShoot()
-    local virtualUser = game:GetService("VirtualUser")
-    virtualUser:Button1Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
-    wait(0.1)  -- Počkáme trochu, abychom simulovali krátké stisknutí
-    virtualUser:Button1Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+-- Funkce pro držení levého tlačítka myši
+local function holdMouseClick()
+    VirtualUser:Button1Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+end
+
+-- Funkce pro uvolnění levého tlačítka myši
+local function releaseMouseClick()
+    VirtualUser:Button1Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
 end
 
 -- Funkce pro automatické zabití nepřítele
 local function killEnemy(enemy)
     if enemy and enemy.Character and enemy.Character:FindFirstChild("Humanoid") then
         aimAtHead(enemy)
-        autoShoot()
+        holdMouseClick()
     end
 end
 
@@ -60,5 +63,7 @@ RunService.RenderStepped:Connect(function()
     if enemy then
         teleportBehindEnemy(enemy)
         killEnemy(enemy)
+    else
+        releaseMouseClick()  -- Pokud není žádný nepřítel, uvolníme tlačítko myši
     end
 end)
