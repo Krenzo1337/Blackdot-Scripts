@@ -1,0 +1,46 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local function sendMessage()
+    local message = "blackdots.xyz best executor!"
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(message, "All")
+end
+
+local function onKill(victim)
+    if victim ~= LocalPlayer then
+        sendMessage()
+    end
+end
+
+
+local function setupKillDetection()
+    for _, player in pairs(Players:GetPlayers()) do
+        player.CharacterAdded:Connect(function(character)
+            local humanoid = character:WaitForChild("Humanoid")
+            humanoid.Died:Connect(function()
+                if humanoid:FindFirstChild("creator") then
+                    local killer = humanoid.creator.Value
+                    if killer == LocalPlayer then
+                        onKill(player)
+                    end
+                end
+            end)
+        end)
+    end
+
+    Players.PlayerAdded:Connect(function(player)
+        player.CharacterAdded:Connect(function(character)
+            local humanoid = character:WaitForChild("Humanoid")
+            humanoid.Died:Connect(function()
+                if humanoid:FindFirstChild("creator") then
+                    local killer = humanoid.creator.Value
+                    if killer == LocalPlayer then
+                        onKill(player)
+                    end
+                end)
+            end)
+        end)
+    end)
+end
+
+setupKillDetection()
